@@ -78,7 +78,7 @@ Code example (in your REPL, you can remove comments):
 
 ## Other calls of javafx-clj.wrapper/launch
 
-```
+```clojure
 (javafx-clj.wrapper/launch) ; the scene is created but we can't see it because its size is set to 0
 (javafx-clj.wrapper/launch :width 300 :height 300)
 (javafx-clj.wrapper/launch :width 300 :height 300 :depth-buffer true)
