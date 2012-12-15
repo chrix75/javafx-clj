@@ -24,6 +24,14 @@ Thus, in my project config file project.clj, I use this dependency local.oracle/
 
 Fetch the code, either by downloading the archive or by forking the repository.
 
+## See one example
+
+Go to the project folder and run
+
+```
+lein test
+```
+
 ## Usage in REPl
 
 Code example (in your REPL, you can remove comments):

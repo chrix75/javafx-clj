@@ -22,6 +22,18 @@
      (let [f# (fn [] ~@body)]
        (Platform/runLater f#))))
 
+(defn stopped?
+  "Checks if the application is stopped."
+  []
+  (FXApplication/isStopped))
+
+(defn launched?
+  "Tests if the JavaFX application is launched."
+  []
+  (and (not (nil? @primary-scene))
+       (not (nil? @primary-stage))
+       (not (nil? @primary-root))))
+
 (defn start-fxapplication
   "Starts the JavaFX thread. This function should not be called directly.\n
    Don't forget you cann launch the JavaFX Application more one time."
@@ -29,7 +41,8 @@
   (reset! fxapp (future (Application/launch javafx.clojure.FXApplication (into-array String []))))
                                         ; waits for the FXThread be started.
                                         ; TODO: write a better code
-  (Thread/sleep 1000))
+  (while (nil? (javafx.clojure.FXApplication/getCurrentStage))
+    (Thread/sleep 100)))
 
 (defn launch-app
   "Launches a basic JavaFX application. This function lays on the FXApplication to work.\n
@@ -90,5 +103,6 @@
 
 
 (defn add-child
+  "Adds a node to a group."
   [group node]
   (-> (.getChildren group) (.add node)))
