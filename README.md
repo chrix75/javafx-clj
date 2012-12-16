@@ -1,4 +1,4 @@
-# datafx-clj
+# javafx-clj
 
 A wrapper to develop application with Clojure and JavaFX. This project lets you manipulate JavaFX in the REPL.
 
