@@ -6,8 +6,8 @@
              #^{:static true} [isStopped [] Boolean]]
    :exposes-methods {stop parentStop}))
 
-(def current-stage (atom nil))
-(def stopped (atom false))
+(def current-stage (promise))
+(def stopped (promise))
 
 (defn -getCurrentStage
   []
@@ -18,9 +18,9 @@
   @stopped)
 
 (defn -start [this stage]
-  (reset! current-stage stage))
+  (deliver current-stage stage))
 
 
 (defn -stop [this]
   (.parentStop this)
-  (reset! stopped true))
+  (deliver stopped true))

@@ -4,10 +4,10 @@
            [javafx.application Application Platform]
            [javafx.scene Scene Group]))
 
-(defonce primary-stage (atom nil))
-(defonce primary-root (atom nil))
-(defonce primary-scene (atom nil))
-(defonce fxapp (atom nil))
+(defonce primary-stage (promise))
+(defonce primary-root (promise))
+(defonce primary-scene (promise))
+(defonce fxapp (promise))
 
 (defmacro with-javafx 
   "Runs a body inside the JavaFX thread."
@@ -19,30 +19,27 @@
   "Runs a code inside the JavaFX thread. You can bind variables that are used inside the body."
   [bindings & body]
   `(let ~bindings
-     (let [f# (fn [] ~@body)]
-       (Platform/runLater f#))))
+     (with-javafx ~@body)))
 
-(defn stopped?
+(defn wait-stopping
   "Checks if the application is stopped."
   []
   (FXApplication/isStopped))
 
-(defn launched?
+(defn wait-launching
   "Tests if the JavaFX application is launched."
   []
-  (and (not (nil? @primary-scene))
-       (not (nil? @primary-stage))
-       (not (nil? @primary-root))))
+  @primary-scene
+  @primary-stage
+  @primary-root)
 
 (defn start-fxapplication
   "Starts the JavaFX thread. This function should not be called directly.\n
    Don't forget you cann launch the JavaFX Application more one time."
   []
-  (reset! fxapp (future (Application/launch javafx.clojure.FXApplication (into-array String []))))
-                                        ; waits for the FXThread be started.
-                                        ; TODO: write a better code
-  (while (nil? (javafx.clojure.FXApplication/getCurrentStage))
-    (Thread/sleep 100)))
+  (deliver fxapp (future (Application/launch javafx.clojure.FXApplication (into-array String []))))
+  (javafx.clojure.FXApplication/getCurrentStage)
+)
 
 (defn launch-app
   "Launches a basic JavaFX application. This function lays on the FXApplication to work.\n
@@ -51,9 +48,9 @@
      (start-fxapplication)
 
      (with-javafx
-         (reset! primary-root (Group.))
-         (reset! primary-scene (Scene. @primary-root))
-         (reset! primary-stage (javafx.clojure.FXApplication/getCurrentStage))
+         (deliver primary-root (Group.))
+         (deliver primary-scene (Scene. @primary-root))
+         (deliver primary-stage (javafx.clojure.FXApplication/getCurrentStage))
          (.setScene @primary-stage @primary-scene)))
 
   ([width height]
@@ -63,9 +60,9 @@
            h (if (nil? height) 0 height)]
 
        (with-javafx
-         (reset! primary-root (Group.))
-         (reset! primary-scene (Scene. @primary-root (double w) (double h)))
-         (reset! primary-stage (javafx.clojure.FXApplication/getCurrentStage))
+         (deliver primary-root (Group.))
+         (deliver primary-scene (Scene. @primary-root (double w) (double h)))
+         (deliver primary-stage (javafx.clojure.FXApplication/getCurrentStage))
          (.setScene @primary-stage @primary-scene))))
   
 
@@ -77,9 +74,9 @@
            h (if (nil? height) 0 height)]
 
        (with-javafx
-         (reset! primary-root (Group.))
-         (reset! primary-scene (Scene. @primary-root (double w) (double h) (boolean db)))
-         (reset! primary-stage (javafx.clojure.FXApplication/getCurrentStage))
+         (deliver primary-root (Group.))
+         (deliver primary-scene (Scene. @primary-root (double w) (double h) (boolean db)))
+         (deliver primary-stage (javafx.clojure.FXApplication/getCurrentStage))
 
          (if-not (nil? paint)
            (.setFill @primary-scene paint))
