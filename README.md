@@ -1,3 +1,10 @@
+# IMPORTANT NOTE
+
+The project has now a more formal name: clj-javafx
+
+So, to get the last version go to https://github.com/chrix75/clj-javafx
+
+
 # javafx-clj
 
 A wrapper to develop application with Clojure and JavaFX. This project lets you manipulate JavaFX in the REPL.
